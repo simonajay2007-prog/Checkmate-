@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kali Linux Online - Try Kali Linux in Your Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #00ff00;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            padding: 20px;
+            color: #00ff00;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+        
+        .sidebar h2 {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar li {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 3px solid #00ff00;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 3px;
+        }
+        
+        .sidebar li:hover {
+            background: rgba(0, 255, 0, 0.3);
+            padding-left: 15px;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .main-content {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .terminal {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 3px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            min-height: 400px;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+        
+        .terminal::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal::-webkit-scrollbar-track {
+            background: #000;
+        }
+        
+        .terminal::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border-radius: 4px;
+        }
+        
+        .terminal-line {
+            margin: 2px 0;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+        
+        .terminal-line.command {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        .terminal-line.output {
+            color: #00aa00;
+        }
+        
+        .terminal-line.error {
+            color: #ff0000;
+        }
+        
+        .terminal-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .terminal-input input {
+            flex: 1;
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            border-radius: 3px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .terminal-input input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00ff00;
+            border-color: #00cc00;
+        }
+        
+        .terminal-input button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .terminal-input button:hover {
+            background: #00cc00;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .terminal-input button:active {
+            transform: scale(0.95);
+        }
+        
+        .loading {
+            display: none;
+            color: #ffff00;
+        }
+        
+        .loading.active {
+            display: inline;
+            animation: blink 0.7s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .tab-btn {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .tab-btn.active {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+        
+        .tab-btn:hover {
+            background: rgba(0, 255, 0, 0.4);
+        }
+        
+        .info-box {
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 4px solid #00ff00;
+            color: #00ff00;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+        
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            text-align: center;
+            padding: 20px;
+            border-top: 3px solid #00ff00;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔓 Kali Linux Online</h1>
+        <p>Try Kali Linux directly in your browser - No download required!</p>
+    </header>
+    
+    <div class="container">
+        <div class="sidebar">
+            <h2>🔍 Penetration Testing Tools</h2>
+            <ul>
+                <li onclick="runCommand('nmap --version')">🔍 Nmap (Port Scanner)</li>
+                <li onclick="runCommand('wireshark --version')">📡 Wireshark (Packet Analyzer)</li>
+                <li onclick="runCommand('aircrack-ng --version')">📶 Aircrack-ng (WiFi)</li>
+                <li onclick="runCommand('sqlmap --version')">💾 SQLMap (SQL Injection)</li>
+                <li onclick="runCommand('john --version')">🔑 John (Hash Cracker)</li>
+                <li onclick="runCommand('hashcat --version')">🔐 Hashcat</li>
+            </ul>
+            
+            <h2>💻 System Commands</h2>
+            <ul>
+                <li onclick="runCommand('ls -la')">📁 List Files</li>
+                <li onclick="runCommand('pwd')">📍 Current Directory</li>
+                <li onclick="runCommand('whoami')">👤 Current User</li>
+                <li onclick="runCommand('uname -a')">🖥️ System Info</li>
+                <li onclick="runCommand('ifconfig')">🌐 Network Info</li>
+                <li onclick="runCommand('df -h')">💾 Disk Usage</li>
+            </ul>
+            
+            <h2>⚙️ Utilities</h2>
+            <ul>
+                <li onclick="runCommand('date')">📅 Date/Time</li>
+                <li onclick="runCommand('whoami && pwd')">📊 User & Path</li>
+                <li onclick="clearTerminal()">🧹 Clear Terminal</li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="info-box">
+                ℹ️ Welcome to Kali Linux Online! Execute commands below or click tools from the sidebar.
+            </div>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('terminal', this)">🖥️ Terminal</button>
+            </div>
+            
+            <div id="terminal-section">
+                <div class="terminal" id="terminal-output">
+                    <div class="terminal-line">kali@linux:~# Welcome to Kali Linux Online Terminal</div>
+                    <div class="terminal-line">Type commands below or click tools from the sidebar</div>
+                </div>
+                <div class="terminal-input">
+                    <input type="text" id="command-input" placeholder="Enter command..." onkeypress="if(event.key==='Enter') runCommand(this.value)">
+                    <button onclick="runCommand(document.getElementById('command-input').value)">Execute</button>
+                    <span class="loading" id="loading">⏳</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>⚠️ Educational & Authorized Use Only</p>
+        <p>&copy; 2026 Checkmate - Kali Linux Online</p>
+    </footer>
+    
+    <script>
+        const terminalOutput = document.getElementById('terminal-output');
+        const commandInput = document.getElementById('command-input');
+        const loadingSpan = document.getElementById('loading');
+        
+        async function runCommand(cmd) {
+            if (!cmd.trim()) return;
+            
+            // Add command to terminal
+            const cmdLine = document.createElement('div');
+            cmdLine.className = 'terminal-line command';
+            cmdLine.textContent = `kali@linux:~# ${cmd}`;
+            terminalOutput.appendChild(cmdLine);
+            
+            // Show loading indicator
+            loadingSpan.classList.add('active');
+            commandInput.disabled = true;
+            
+            try {
+                const response = await fetch('/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ command: cmd })
+                });
+                
+                const data = await response.json();
+                
+                if (data.output) {
+                    const outputLine = document.createElement('div');
+                    outputLine.className = 'terminal-line output';
+                    outputLine.textContent = data.output;
+                    terminalOutput.appendChild(outputLine);
+                }
+                
+                if (data.error) {
+                    const errorLine = document.createElement('div');
+                    errorLine.className = 'terminal-line error';
+                    errorLine.textContent = data.error;
+                    terminalOutput.appendChild(errorLine);
+                }
+            } catch (error) {
+                const errorLine = document.createElement('div');
+                errorLine.className = 'terminal-line error';
+                errorLine.textContent = `Error: ${error.message}`;
+                terminalOutput.appendChild(errorLine);
+            }
+            
+            // Hide loading indicator
+            loadingSpan.classList.remove('active');
+            commandInput.disabled = false;
+            
+            // Scroll to bottom
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            commandInput.value = '';
+            commandInput.focus();
+        }
+        
+        function clearTerminal() {
+            terminalOutput.innerHTML = '';
+            const welcomeLine = document.createElement('div');
+            welcomeLine.className = 'terminal-line';
+            welcomeLine.textContent = 'kali@linux:~# Terminal cleared';
+            terminalOutput.appendChild(welcomeLine);
+        }
+        
+        function switchTab(tab, button) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        }
+        
+        // Focus on input on page load
+        window.addEventListener('load', () => {
+            commandInput.focus();
+        });
+    </script>
+</body>
+</html>
