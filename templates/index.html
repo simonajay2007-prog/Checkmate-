@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kali Linux Online - Try Without Download</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .info-box p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        .status-message {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .session-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .session-details h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .detail-value {
+            color: #667eea;
+            word-break: break-all;
+        }
+        
+        .features {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .features h3 {
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        .features ul {
+            list-style: none;
+        }
+        
+        .features li {
+            padding: 8px 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+        
+        .features li:before {
+            content: "✓";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔓 Kali Linux Online</h1>
+        <p class="subtitle">Try Kali Linux in your browser - No download required!</p>
+        
+        <div class="info-box">
+            <h3>How it works:</h3>
+            <p>Click "Launch Session" to start a temporary Kali Linux environment. Access it via VNC connection for a full desktop experience.</p>
+        </div>
+        
+        <div id="statusMessage" class="status-message"></div>
+        
+        <div id="sessionDetails" class="session-details">
+            <h3>Active Session</h3>
+            <div class="detail-row">
+                <span class="detail-label">Session ID:</span>
+                <span class="detail-value" id="sessionId">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status:</span>
+                <span class="detail-value" id="sessionStatus">Starting...</span>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-primary" id="launchBtn" onclick="launchSession()">
+                Launch Session
+            </button>
+            <button class="btn-secondary" id="connectBtn" onclick="connectVNC()" style="display: none;">
+                Connect to VNC
+            </button>
+        </div>
+        
+        <button class="btn-secondary" id="stopBtn" onclick="stopSession()" style="display: none; width: 100%;">
+            Stop Session
+        </button>
+        
+        <div class="features">
+            <h3>Features:</h3>
+            <ul>
+                <li>Full Kali Linux Desktop Environment</li>
+                <li>Pre-installed Security Tools</li>
+                <li>30-minute automatic timeout</li>
+                <li>No local installation required</li>
+                <li>Complete isolation & security</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        let currentSessionId = null;
+        let vncCheckInterval = null;
+        
+        function showMessage(message, type = 'info') {
+            const element = document.getElementById('statusMessage');
+            element.textContent = message;
+            element.className = `status-message ${type}`;
+        }
+        
+        function updateUI(state) {
+            const launchBtn = document.getElementById('launchBtn');
+            const connectBtn = document.getElementById('connectBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const sessionDetails = document.getElementById('sessionDetails');
+            
+            if (state === 'idle') {
+                launchBtn.style.display = 'block';
+                connectBtn.style.display = 'none';
+                stopBtn.style.display = 'none';
+                sessionDetails.style.display = 'none';
+            } else if (state === 'loading') {
+                launchBtn.disabled = true;
+                launchBtn.innerHTML = '<span class="loading-spinner"></span>Starting...';
+            } else if (state === 'active') {
+                launchBtn.style.display = 'none';
+                connectBtn.style.display = 'block';
+                stopBtn.style.display = 'block';
+                sessionDetails.style.display = 'block';
+                launchBtn.disabled = false;
+            }
+        }
+        
+        async function launchSession() {
+            updateUI('loading');
+            showMessage('Launching Kali Linux session...', 'info');
+            
+            try {
+                const response = await fetch('/api/session/create', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentSessionId = data.session_id;
+                    document.getElementById('sessionId').textContent = data.session_id;
+                    document.getElementById('sessionStatus').textContent = 'Initializing...';
+                    
+                    showMessage('Session created! Initializing VNC...', 'success');
+                    updateUI('active');
+                    
+                    // Check VNC availability
+                    checkVNCAvailability();
+                } else {
+                    showMessage('Failed to start session: ' + data.message, 'error');
+                    updateUI('idle');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+                updateUI('idle');
+            }
+        }
+        
+        async function checkVNCAvailability() {
+            if (!currentSessionId) return;
+            
+            vncCheckInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/session/${currentSessionId}/vnc-url`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        clearInterval(vncCheckInterval);
+                        document.getElementById('sessionStatus').textContent = 'Ready';
+                        showMessage('Session ready! Click "Connect to VNC" to access.', 'success');
+                        sessionStorage.setItem('vncUrl', data.vnc_url);
+                    } else if (response.status === 410) {
+                        clearInterval(vncCheckInterval);
+                        showMessage('Session expired.', 'error');
+                        resetSession();
+                    }
+                } catch (error) {
+                    console.error('VNC check error:', error);
+                }
+            }, 2000);
+        }
+        
+        function connectVNC() {
+            const vncUrl = sessionStorage.getItem('vncUrl');
+            if (vncUrl) {
+                window.open(vncUrl, 'vncWindow', 'width=1280,height=1024');
+            } else {
+                showMessage('VNC URL not available yet. Please wait...', 'error');
+            }
+        }
+        
+        async function stopSession() {
+            if (!currentSessionId) return;
+            
+            try {
+                const response = await fetch(`/api/session/${currentSessionId}/stop`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showMessage('Session stopped successfully.', 'success');
+                    resetSession();
+                }
+            } catch (error) {
+                showMessage('Error stopping session: ' + error.message, 'error');
+            }
+        }
+        
+        function resetSession() {
+            clearInterval(vncCheckInterval);
+            currentSessionId = null;
+            sessionStorage.removeItem('vncUrl');
+            updateUI('idle');
+            document.getElementById('statusMessage').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
